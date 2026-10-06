@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block content %}
+<article class="recall">
+<p class="kicker"><span class="badge b-{{ r.src.code }}">{{ r.src.agency }}</span> {{ r.category }} recall · <time datetime="{{ r.date }}">{{ r.date | human_date }}</time></p>
+<h1>{{ r.headline }}</h1>
+{% if r.doNotDrive %}<p class="alert"><strong>Do not drive:</strong> NHTSA and the manufacturer advise owners not to drive affected vehicles until repaired.</p>{% endif %}
+{% if r.parkOutside %}<p class="alert"><strong>Park outside:</strong> owners are advised to park affected vehicles outside and away from structures due to fire risk.</p>{% endif %}
+{% if r.classification == 'Class I' %}<p class="alert">This is an FDA <strong>Class I</strong> recall — the most serious type.</p>{% endif %}
+
+<div class="recall-grid">
+<dl class="facts">
+  <dt>Recall number</dt><dd>{{ r.id }}</dd>
+  <dt>Date</dt><dd><time datetime="{{ r.date }}">{{ r.date | human_date }}</time>{% if r.initiated and r.initiated != r.date %} (initiated {{ r.initiated | human_date }}){% endif %}</dd>
+  <dt>{{ 'Manufacturer' if r.source == 'nhtsa' else 'Company / brand' }}</dt><dd>{% if r.brandPath %}<a href="{{ url(r.brandPath) }}">{{ r.brandName }}</a>{% else %}{{ r.brandName }}{% endif %}{% if r.firmAddress %}<br><small>{{ r.firmAddress }}</small>{% endif %}</dd>
+  <dt>Category</dt><dd><a href="{{ url('/category/' ~ r.catSlug ~ '/') }}">{{ r.category }}</a>{% if r.subSlug %} › <a href="{{ url('/category/' ~ r.catSlug ~ '/' ~ r.subSlug ~ '/') }}">{{ r.subcategory }}</a>{% endif %}</dd>
+  {% if r.classification %}<dt>Classification</dt><dd>{{ r.classification }}</dd>{% endif %}
+  {% if r.recallType %}<dt>Recall type</dt><dd>{{ r.recallType }}</dd>{% endif %}
+  {% if r.status %}<dt>Status</dt><dd>{{ r.status }}</dd>{% endif %}
+  {% if r.quantity %}<dt>Units affected</dt><dd>{{ r.quantity }}</dd>{% endif %}
+  {% if r.hazardTags %}<dt>Hazard tags</dt><dd>{% for t in r.hazardTags %}<a class="tag" href="{{ url('/hazard/' ~ (t|slug) ~ '/') }}">{{ t }}</a> {% endfor %}</dd>{% endif %}
+  {% if r.initiatedBy %}<dt>Initiated by</dt><dd>{{ r.initiatedBy }}</dd>{% endif %}
+</dl>
+{% if r.image %}<figure class="photo"><img src="{{ r.image }}" alt="Recalled product: {{ r.name }}" loading="lazy" width="320" height="240"><figcaption>Image: CPSC</figcaption></figure>{% endif %}
+</div>
+
+<p class="official"><a class="btn" href="{{ r.link }}" rel="noopener nofollow">Read the official {{ r.src.agency }} notice ↗</a></p>
+
+{% with slot='recall-top' %}{% include '_ad.html' %}{% endwith %}
+
+{% if r.product %}<h2>Product</h2><p>{{ r.product }}</p>{% endif %}
+
+{% if vehicles %}
+<h2>Affected vehicles</h2>
+<div class="table-wrap"><table class="vehicles"><thead><tr><th>Make</th><th>Model</th><th>Model years</th></tr></thead><tbody>
+{% for v in vehicles[:60] %}<tr><td>{{ v.make }}</td><td>{% if v.path %}<a href="{{ url(v.path) }}">{{ v.model }}</a>{% else %}{{ v.model }}{% endif %}</td><td>{{ v.years or '—' }}</td></tr>{% endfor %}
+</tbody></table></div>
+{% if vehicles|length > 60 %}<p class="muted">…and {{ vehicles|length - 60 }} more. See the official notice for the full list.</p>{% endif %}
+<p>Not every vehicle of these models is affected. <a href="https://www.nhtsa.gov/recalls" rel="noopener">Enter your 17-character VIN on NHTSA.gov</a> to check your vehicle.</p>
+{% endif %}
+
+{% if r.reason %}<h2>{{ 'Description' if r.source == 'cpsc' else 'Why was it recalled?' }}</h2><p>{{ r.reason }}</p>{% endif %}
+{% if r.hazard %}<h2>{{ 'Consequence' if r.source == 'nhtsa' else 'Hazard' }}</h2><p>{{ r.hazard }}</p>{% endif %}
+{% if r.injuries %}<h2>Incidents / injuries</h2><p>{{ r.injuries }}</p>{% endif %}
+
+<h2>What should you do?</h2>
+{% if r.remedy %}<p>{{ r.remedy }}</p>{% if r.remedyOptions %}<p class="muted">Remedy type: {{ r.remedyOptions | join(', ') }}</p>{% endif %}
+{% elif r.source.startswith('fda') %}<p>FDA enforcement reports do not list a consumer remedy. Check the product codes below against what you have; if it matches, stop using it and follow the instructions in the firm's or FDA's official notice, or contact the company. If you have health concerns, contact your healthcare provider.</p>
+{% else %}<p>Follow the instructions in the official notice.</p>{% endif %}
+{% if r.consumerContact %}<p><strong>Contact:</strong> {{ r.consumerContact }}</p>{% endif %}
+
+{% if r.codeInfo %}<h2>{{ 'Manufacturer campaign number' if r.source == 'nhtsa' else ('Model numbers' if r.source == 'cpsc' else 'Product codes & lot numbers') }}</h2><p class="code">{{ r.codeInfo }}</p>{% endif %}
+{% if r.upcs %}<p class="code">UPC: {{ r.upcs | join(', ') }}</p>{% endif %}
+
+{% if r.distribution or states %}<h2>{{ 'Where it was sold' if r.source == 'cpsc' else 'Distribution' }}</h2>
+{% if r.distribution %}<p>{{ r.distribution }}</p>{% endif %}
+{% if states %}<p>States: {% for code, name in states %}<a class="tag" href="{{ url('/state/' ~ code|lower ~ '/') }}">{{ name }}</a> {% endfor %}</p>{% endif %}
+{% endif %}
+{% if r.manufacturedIn %}<p class="muted">Manufactured in: {{ r.manufacturedIn | join(', ') }}</p>{% endif %}
+
+{% if class_info %}<h2>What does {{ r.classification }} mean?</h2><p>{{ class_info }}</p>{% endif %}
+
+<p class="source-note">Source: {{ r.src.label }}, recall {{ r.id }}. <a href="{{ r.link }}" rel="noopener nofollow">Official notice</a>. Republished from public data; {{ site_name }} is not affiliated with the {{ r.src.agency }}.</p>
+</article>
+
+{% with slot='recall-bottom' %}{% include '_ad.html' %}{% endwith %}
+
+{% for gtitle, more, items in related %}
+<section class="related"><h2>{{ gtitle }}</h2>
+{% include '_items.html' %}
+{% if more %}<p><a href="{{ url(more) }}">See all →</a></p>{% endif %}
+</section>
+{% endfor %}
+{% endblock %}

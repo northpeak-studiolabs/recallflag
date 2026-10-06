@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>About {{ site_name }}</h1>
+<p class="lead">{{ site_name }} collects official U.S. recall data every day and turns it into fast, searchable pages — one per recall, plus lists by brand, category, hazard, state, month and vehicle model.</p>
+<h2>Where the data comes from</h2>
+<ul>
+  <li><strong>FDA</strong> — food, drug and medical device enforcement reports via openFDA ({{ '{:,}'.format(counts.get('fda-food',0)) }} food, {{ '{:,}'.format(counts.get('fda-drug',0)) }} drug, {{ '{:,}'.format(counts.get('fda-device',0)) }} device recalls).</li>
+  <li><strong>CPSC</strong> — consumer product recalls via the SaferProducts.gov Recalls API ({{ '{:,}'.format(counts.get('cpsc',0)) }}).</li>
+  <li><strong>NHTSA</strong> — vehicle, equipment, tire and child-seat recalls from data.transportation.gov and NHTSA's recall flat files ({{ '{:,}'.format(counts.get('nhtsa',0)) }}).</li>
+</ul>
+<p>The site covers recalls published since {{ since | human_date }}.</p>
+<h2>Limitations</h2>
+<ul>
+  <li>FDA enforcement reports are published weekly and can lag the company's own announcement by days or weeks.</li>
+  <li>Hazard tags, product types and states are assigned automatically from the agencies' text and can be wrong or incomplete.</li>
+  <li>Vehicle recall pages list models and years named in the recall; not every vehicle is affected. Always check your VIN at <a href="https://www.nhtsa.gov/recalls" rel="noopener">nhtsa.gov/recalls</a>.</li>
+</ul>
+<h2>Independence</h2>
+<p>{{ site_name }} is independent and not affiliated with the FDA, CPSC, NHTSA or any government agency. This site may show advertising to cover running costs.</p>
+{% endblock %}

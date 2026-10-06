@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Search recalls</h1>
+<form class="big-search" action="{{ url('/search/') }}" method="get" role="search" id="sf">
+  <label class="sr" for="q">Search recalls</label>
+  <input id="q" name="q" type="search" placeholder="Product, brand, vehicle or recall number" autocomplete="off" autofocus>
+  <button type="submit">Search</button>
+</form>
+<p id="status" class="muted" role="status">Type at least 2 characters.</p>
+<ul class="items" id="results"></ul>
+<noscript><p>Search needs JavaScript. Browse by <a href="{{ url('/brand/') }}">brand</a>, <a href="{{ url('/category/food/') }}">category</a> or <a href="{{ url('/month/') }}">month</a> instead.</p></noscript>
+{% endblock %}
+{% block scripts %}<script>window.RW_BASE = {{ url('') | tojson }};</script><script src="{{ url('/assets/search.js') }}" defer></script>{% endblock %}

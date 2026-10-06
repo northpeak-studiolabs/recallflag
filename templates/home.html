@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+  <h1>Is your food, medicine, product or car recalled?</h1>
+  <p class="lead">Search {{ '{:,}'.format(total) }} U.S. recalls from the FDA, CPSC and NHTSA from the last two years. Updated daily.</p>
+  <form class="big-search" action="{{ url('/search/') }}" method="get" role="search">
+    <label class="sr" for="q">Search recalls</label>
+    <input id="q" name="q" type="search" placeholder="e.g. peanut butter, Honda CR-V, crib, Medline" autocomplete="off">
+    <button type="submit">Search</button>
+  </form>
+  <ul class="cat-cards">
+  {% for slug, name, n in cats %}<li><a href="{{ url('/category/' ~ slug ~ '/') }}"><strong>{{ name }}</strong><span>{{ '{:,}'.format(n) }} recalls</span></a></li>{% endfor %}
+  </ul>
+</section>
+{% with slot='home-top' %}{% include '_ad.html' %}{% endwith %}
+<div class="two-col">
+<section>
+  <h2>Latest recalls</h2>
+  {% with items=latest %}{% include '_items.html' %}{% endwith %}
+  <p><a href="{{ url(months[0][1]) }}">All recalls this month →</a></p>
+</section>
+<aside>
+  {% if class1 %}<h2>Recent FDA Class I recalls</h2>{% with items=class1 %}{% include '_items.html' %}{% endwith %}{% endif %}
+  {% with slot='home-side' %}{% include '_ad.html' %}{% endwith %}
+  <h2>Top brands &amp; firms</h2>
+  <ul class="chips">{% for n, p, c in top_brands %}<li><a href="{{ url(p) }}">{{ n }} ({{ c }})</a></li>{% endfor %}</ul>
+  <p><a href="{{ url('/brand/') }}">All brands A–Z →</a></p>
+  <h2>By hazard</h2>
+  <ul class="chips">{% for n, p in hazards %}<li><a href="{{ url(p) }}">{{ n }}</a></li>{% endfor %}</ul>
+  <h2>By month</h2>
+  <ul class="chips">{% for n, p in months %}<li><a href="{{ url(p) }}">{{ n }}</a></li>{% endfor %}</ul>
+</aside>
+</div>
+{% endblock %}

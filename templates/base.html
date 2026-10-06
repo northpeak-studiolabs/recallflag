@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}{% if title and site_name not in title %} | {{ site_name }}{% endif %}</title>
+<meta name="description" content="{{ description }}">
+{% if noindex %}<meta name="robots" content="noindex, follow">{% endif %}
+{% if canonical %}<link rel="canonical" href="{{ abs_url(canonical) }}">{% endif %}
+<meta property="og:type" content="{{ 'article' if r is defined else 'website' }}">
+<meta property="og:site_name" content="{{ site_name }}">
+<meta property="og:title" content="{{ title }}">
+<meta property="og:description" content="{{ description }}">
+{% if canonical %}<meta property="og:url" content="{{ abs_url(canonical) }}">{% endif %}
+{% if r is defined and r.image %}<meta property="og:image" content="{{ r.image }}">{% endif %}
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#b42318">
+<link rel="icon" href="{{ url('/assets/favicon.svg') }}" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="{{ site_name }} – latest recalls" href="{{ url('/feed.xml') }}">
+<link rel="stylesheet" href="{{ url('/assets/style.css') }}">
+{# ADSENSE: when approved, add the AdSense <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX"> tag here. #}
+{% if jsonld %}<script type="application/ld+json">{{ jsonld | safe }}</script>{% endif %}
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <div class="wrap head-row">
+    <a class="logo" href="{{ url('/') }}"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2 1 21h22L12 2zm0 5.5 7.4 12.5H4.6L12 7.5zM11 10v5h2v-5h-2zm0 6v2h2v-2h-2z"/></svg>{{ site_name }}</a>
+    <form class="head-search" action="{{ url('/search/') }}" method="get" role="search">
+      <label class="sr" for="hq">Search recalls</label>
+      <input id="hq" name="q" type="search" placeholder="Search recalls…" autocomplete="off">
+    </form>
+  </div>
+  <nav class="wrap nav" aria-label="Main">
+    <a href="{{ url('/category/food/') }}">Food</a>
+    <a href="{{ url('/category/drugs/') }}">Drugs</a>
+    <a href="{{ url('/category/medical-devices/') }}">Devices</a>
+    <a href="{{ url('/category/consumer-products/') }}">Products</a>
+    <a href="{{ url('/vehicle/') }}">Vehicles</a>
+    <a href="{{ url('/brand/') }}">Brands</a>
+    <a href="{{ url('/hazard/') }}">Hazards</a>
+    <a href="{{ url('/state/') }}">States</a>
+  </nav>
+</header>
+<main id="main" class="wrap">
+{% if crumbs %}
+<nav class="crumbs" aria-label="Breadcrumb"><ol>
+{% for name, path in crumbs %}<li>{% if path %}<a href="{{ url(path) }}">{{ name }}</a>{% else %}<span aria-current="page">{{ name }}</span>{% endif %}</li>{% endfor %}
+</ol></nav>
+{% endif %}
+{% block content %}{% endblock %}
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    {% if signup %}{% include '_signup.html' %}{% endif %}
+    <div class="foot-cols">
+      <div>
+        <h2>Data sources</h2>
+        <ul>{% for name, link in data_sources %}<li><a href="{{ link }}" rel="noopener">{{ name }}</a></li>{% endfor %}</ul>
+      </div>
+      <div>
+        <h2>Browse</h2>
+        <ul>
+          <li><a href="{{ url('/month/') }}">Recalls by month</a></li>
+          <li><a href="{{ url('/vehicle/') }}">Vehicle recalls by make</a></li>
+          <li><a href="{{ url('/feed.xml') }}">RSS feed</a></li>
+          <li><a href="{{ url('/about/') }}">About &amp; methodology</a></li>
+          <li><a href="{{ url('/privacy/') }}">Privacy</a></li>
+          <li><a href="{{ url('/contact/') }}">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="disclaimer"><strong>{{ site_name }} is an independent site and is not affiliated with, endorsed by, or operated by the FDA, CPSC, NHTSA or any U.S. government agency.</strong>
+    Information is republished from public government data and may be incomplete or out of date. Always check the official notice linked on each page, and for vehicles confirm with your VIN at nhtsa.gov.</p>
+    <p class="updated">Data last updated: <time datetime="{{ updated }}">{{ updated_human }}</time> · © {{ year }} {{ site_name }}</p>
+  </div>
+</footer>
+{% block scripts %}{% endblock %}
+</body>
+</html>

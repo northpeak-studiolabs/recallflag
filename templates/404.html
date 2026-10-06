@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Page not found</h1>
+<p class="lead">This recall page may have moved or no longer be in our two-year window.</p>
+<form class="big-search" action="{{ url('/search/') }}" method="get" role="search">
+  <label class="sr" for="q">Search recalls</label>
+  <input id="q" name="q" type="search" placeholder="Search recalls" autocomplete="off">
+  <button type="submit">Search</button>
+</form>
+<p><a href="{{ url('/') }}">← Back to the latest recalls</a></p>
+{% endblock %}

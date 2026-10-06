@@ -1,0 +1,11 @@
+{# EMAIL SIGNUP PLACEHOLDER — no backend yet. Wire the form action to a newsletter provider (Buttondown, MailerLite, etc.) later. #}
+<section class="signup" id="alerts" aria-labelledby="signup-h">
+  <h2 id="signup-h">Get recall alerts</h2>
+  <p>A free daily or weekly email when new recalls match the brands, products or vehicles you care about.</p>
+  <form class="signup-form" action="#" method="post" onsubmit="this.querySelector('.signup-msg').hidden=false;return false;">
+    <label class="sr" for="signup-email">Email address</label>
+    <input id="signup-email" type="email" name="email" placeholder="you@example.com" required>
+    <button type="submit">Notify me</button>
+    <p class="signup-msg" role="status" hidden>Thanks! Email alerts are launching soon — this form is a placeholder and did not store your address.</p>
+  </form>
+</section>

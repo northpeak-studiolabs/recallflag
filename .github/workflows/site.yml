@@ -1,0 +1,70 @@
+# Drop this file into a PUBLIC repo at .github/workflows/site.yml (repo root = this folder).
+# Repo settings: Settings -> Pages -> Source: "GitHub Actions".
+# Optional repo variables (Settings -> Secrets and variables -> Actions -> Variables):
+#   SITE_URL   e.g. https://recallflag.com  (or https://<user>.github.io/<repo>)
+#   CNAME      e.g. recallflag.com          (only when using a custom domain)
+#   SITE_NAME  e.g. RecallFlag
+#   ADS        placeholder | off            (use "off" until AdSense is approved)
+# Optional secret: OPENFDA_API_KEY (free, raises openFDA quota; not required).
+name: build-and-deploy
+
+on:
+  schedule:
+    - cron: '17 9 * * *'   # daily 09:17 UTC (after FDA/CPSC/NHTSA overnight updates)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      # Keep the HTTP cache and yesterday's data so a failed source falls back to the previous copy.
+      - uses: actions/cache@v4
+        with:
+          path: data
+          key: recall-data-${{ github.run_id }}
+          restore-keys: recall-data-
+      - name: Fetch recalls
+        env:
+          OPENFDA_API_KEY: ${{ secrets.OPENFDA_API_KEY }}
+        run: python fetch.py --days 730 --ttl-hours 6
+      - name: Build site
+        env:
+          SITE_URL: ${{ vars.SITE_URL || format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}
+          SITE_NAME: ${{ vars.SITE_NAME || 'RecallFlag' }}
+          CONTACT_URL: ${{ vars.CONTACT_URL || format('{0}/{1}/issues/new', github.server_url, github.repository) }}
+          CNAME: ${{ vars.CNAME }}
+          ADS: ${{ vars.ADS || 'off' }}
+        run: python build.py
+      - name: Check site (tags, SEO tags, internal links)
+        env:
+          SITE_URL: ${{ vars.SITE_URL || format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}
+        run: python check_site.py
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

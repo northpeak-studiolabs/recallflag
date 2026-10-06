@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ h1 }}{% if page > 1 %} <span class="muted">– page {{ page }}</span>{% endif %}</h1>
+{% if intro %}<p class="lead">{{ intro }}</p>{% endif %}
+{% if summary %}<p class="summary">{{ summary }}</p>{% endif %}
+{% if extra_links %}<p class="extra">{% for n, p in extra_links %}<a href="{{ p if p.startswith('http') else url(p) }}"{% if p.startswith('http') %} rel="noopener"{% endif %}>{{ n }} →</a> {% endfor %}</p>{% endif %}
+{% with slot='hub-top' %}{% include '_ad.html' %}{% endwith %}
+{% if link_groups %}{% for gname, links in link_groups %}
+<details class="chips-box"{% if links|length <= 30 %} open{% endif %}><summary>{{ gname }} ({{ links|length }})</summary>
+<ul class="chips">{% for n, p in links %}<li><a href="{{ url(p) }}">{{ n }}</a></li>{% endfor %}</ul></details>
+{% endfor %}{% endif %}
+{% include '_items.html' %}
+{% if pages > 1 %}
+<nav class="pager" aria-label="Pagination">
+{% if page > 1 %}<a rel="prev" href="{{ url(base_path if page == 2 else base_path ~ 'page/' ~ (page-1) ~ '/') }}">← Newer</a>{% endif %}
+<span>Page {{ page }} of {{ pages }}</span>
+{% if page < pages %}<a rel="next" href="{{ url(base_path ~ 'page/' ~ (page+1) ~ '/') }}">Older →</a>{% endif %}
+</nav>
+{% endif %}
+{% with slot='hub-bottom' %}{% include '_ad.html' %}{% endwith %}
+{% endblock %}

@@ -1,0 +1,9 @@
+<ul class="items">
+{% for x in items %}
+<li class="item">
+  <a class="item-link" href="{{ url(x.path) }}">{{ x.headline }}</a>
+  <div class="item-meta"><span class="badge b-{{ x.src.code }}">{{ x.src.agency }}</span>
+  <time datetime="{{ x.date }}">{{ x.date | human_date }}</time> · {{ x.brandName }}{% if x.classification %} · {{ x.classification }}{% endif %}{% if x.doNotDrive %} · <strong class="warn">Do not drive</strong>{% endif %}{% if x.parkOutside %} · <strong class="warn">Park outside</strong>{% endif %}</div>
+</li>
+{% endfor %}
+</ul>

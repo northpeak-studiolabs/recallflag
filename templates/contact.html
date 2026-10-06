@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Contact</h1>
+<p class="lead">Found a mistake on a recall page, or have a question about {{ site_name }}?</p>
+{% if contact_url %}
+<p><a class="btn" href="{{ contact_url }}" rel="noopener">Send us a message</a></p>
+<p>Please include the page address and what looks wrong.</p>
+{% endif %}
+<h2>Questions about a specific recall</h2>
+<p>{{ site_name }} only republishes public government data. For refunds, repairs or replacements, contact the company named on the recall page, or the agency that issued it:</p>
+<ul>
+  <li>Food, drugs and medical devices: <a href="https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts" rel="noopener">FDA</a></li>
+  <li>Consumer products: <a href="https://www.cpsc.gov/Recalls" rel="noopener">CPSC</a></li>
+  <li>Vehicles, tires and car seats: <a href="https://www.nhtsa.gov/recalls" rel="noopener">NHTSA</a> (check your VIN)</li>
+</ul>
+{% endblock %}

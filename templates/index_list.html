@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ h1 }}</h1>
+{% if intro %}<p class="lead">{{ intro }}</p>{% endif %}
+{% with slot='index-top' %}{% include '_ad.html' %}{% endwith %}
+{% if groups|length > 3 %}<p class="letters">{% for g, _ in groups %}<a href="#l-{{ loop.index }}">{{ g }}</a> {% endfor %}</p>{% endif %}
+{% for g, links in groups %}
+{% if g %}<h2 id="l-{{ loop.index }}">{{ g }}</h2>{% endif %}
+<ul class="chips">{% for n, p in links %}<li><a href="{{ url(p) }}">{{ n }}</a></li>{% endfor %}</ul>
+{% endfor %}
+{% endblock %}
