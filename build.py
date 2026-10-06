@@ -584,6 +584,9 @@ class Site:
         dst.mkdir(parents=True, exist_ok=True)
         for f in (HERE / 'static').iterdir():
             shutil.copy(f, dst / f.name)
+        # Files served from the site root (IndexNow key).
+        for f in (HERE / 'static_root').glob('*'):
+            shutil.copy(f, self.out / f.name)
         # Compact client-side search index: [path-slug, date, label, brand, source code].
         index = []
         for r in self.recalls:

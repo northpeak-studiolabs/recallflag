@@ -12,6 +12,11 @@ on:
   schedule:
     - cron: '17 9 * * *'   # daily 09:17 UTC (after FDA/CPSC/NHTSA overnight updates)
   workflow_dispatch:
+    inputs:
+      indexnow_all:
+        description: 'Submit every page to IndexNow (not just changed ones)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -68,3 +73,20 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  indexnow:
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: artifact
+      - name: Ping IndexNow (Bing, Yandex and others)
+        env:
+          SITE_URL: ${{ vars.SITE_URL || format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}
+          INDEXNOW_ALL: ${{ inputs.indexnow_all }}
+        run: |
+          mkdir -p dist && tar -xf artifact/artifact.tar -C dist
+          python indexnow.py
