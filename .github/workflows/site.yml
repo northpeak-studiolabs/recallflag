@@ -90,3 +90,15 @@ jobs:
         run: |
           mkdir -p dist && tar -xf artifact/artifact.tar -C dist
           python indexnow.py
+
+  bluesky:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Post new recalls to Bluesky (skips if the secrets aren't set)
+        env:
+          SITE_URL: ${{ vars.SITE_URL || format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}
+          BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
+          BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
+        run: python bluesky.py
